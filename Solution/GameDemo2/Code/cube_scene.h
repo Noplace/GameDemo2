@@ -51,6 +51,7 @@ class ThirdPersonCamera : public ve::PrespectiveCamera {
     
   }
 
+
 };
 
 
@@ -74,20 +75,26 @@ class CubeScene : public ve::Scene {
   concurrency::task<int> LoadAsync();
   concurrency::task<int> UnloadAsync();
   int Set();
+  int Unset();
   int Update(float timeTotal, float timeDelta);
   int Render();
+  int UpdateWorldMatrix(const dx::XMMATRIX& world);
 
  private:
 	bool m_loadingComplete;
   //ThirdPersonCamera camera_;
-  FirstPersonCamera camera_;
+  ve::FirstPersonCamera camera_;
+  ID3D11RasterizerState * scene_rasterizer_state_ ;
 	ID3D11Buffer* m_vertexBuffer;
 	ID3D11Buffer* m_indexBuffer;
-	ID3D11Buffer* m_constantBuffer;
+	ID3D11Buffer* vs_cb0;
+  ID3D11Buffer* vs_cb1;
   ve::InputLayout input_layout_;
 	uint32_t m_indexCount;
-	ModelViewProjectionConstantBuffer m_constantBufferData;
+	ModelViewProjectionConstantBuffer vs_cb0_data;
+  TimeConstantBuffer vs_cb1_data;
   ve::Shader ds_,hs_,gs_;
   Terrain* terrain_;
+  Sky* sky_;
 };
 }

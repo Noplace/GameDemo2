@@ -30,13 +30,16 @@ void Renderer::Init(HWND handle_) {
   gfx->Initialize();
   gfx->CreateDisplay(handle_);
 
+  gfx->shader_manager().set_resource_path(ve::GetExePath()+"\\");
+   
+
   loading_scene = new LoadingScene();
   loading_scene->Initialize(gfx);
   loading_scene->Load();
   current_scene = loading_scene;
   current_scene->Set();
 
-  return;
+  
 	auto new_scene = new CubeScene();
   new_scene->Initialize(gfx);
   /*new_scene->LoadAsync().then([this,new_scene](int result){
@@ -44,6 +47,7 @@ void Renderer::Init(HWND handle_) {
     current_scene->Set();
   });*/
   new_scene->Load();
+  current_scene->Unset();
   current_scene = new_scene;
   current_scene->Set();
   
@@ -51,6 +55,7 @@ void Renderer::Init(HWND handle_) {
 }
 
 void Renderer::Deinit() {
+  current_scene->Unset();
   current_scene->Unload();
   current_scene->Deinitialize();
   loading_scene->Unload();
@@ -61,27 +66,12 @@ void Renderer::Deinit() {
 }
 
 void Renderer::Update(float timeTotal, float timeDelta) {
+  gfx->action_manager().Update(timeDelta);
   current_scene->Update(timeTotal,timeDelta);
 }
 
 void Renderer::Render() {
   gfx->ClearTarget();
-/*
-const float midnightBlue[] = { 0.098f, 0.098f, 0.439f, 1.000f };
-	gfx->device()->ClearRenderTargetView(
-		m_renderTargetView,
-		midnightBlue
-		);
-
-	m_d3dContext->ClearDepthStencilView(
-		m_depthStencilView.Get(),
-		D3D11_CLEAR_DEPTH,
-		1.0f,
-		0
-		);*/
-
-	// Only draw the cube once it is loaded (loading is asynchronous).
-
   gfx->SetDefaultTargets();
   current_scene->Render();
   gfx->Render();

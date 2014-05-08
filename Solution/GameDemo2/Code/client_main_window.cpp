@@ -56,6 +56,8 @@ ClientMainWindow::ClientMainWindow() {
   window_class_.lpszClassName = class_name_;
   window_class_.hCursor = LoadCursor((HINSTANCE) NULL, IDC_ARROW); 
   window_class_.hbrBackground = static_cast<HBRUSH>(GetStockObject(BLACK_BRUSH)); 
+  void test_json();
+  //test_json();
 }
 
 ClientMainWindow::~ClientMainWindow() {

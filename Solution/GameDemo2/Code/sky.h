@@ -36,7 +36,7 @@ class Sky : public ve::RenderObject {
 
  public:
   void *operator new( size_t stAllocateBlock) {
-    return _aligned_malloc(sizeof(Terrain),16);
+    return _aligned_malloc(sizeof(Sky),16);
   }
 
    void   operator delete (void* p)  {
@@ -52,16 +52,25 @@ class Sky : public ve::RenderObject {
   int Render();
  private:
 	int status;
-	ID3D11Buffer* vb;
-	ID3D11Buffer* ib;
-  ID3D11Buffer* m_constantBuffer,*sky_ps_cb0,*sky_ps_cb1;
-	//ID3D11Buffer* cb;
-  ve::InputLayout input_layout_;
-	uint32_t m_indexCount;
+	ID3D11Buffer* sky_vb_;
+	ID3D11Buffer* sky_ib_;
+  ID3D11Buffer* *sky_ps_cb0,*sky_ps_cb1;
+	ID3D11DepthStencilState* sky_depth_state_;
+  ID3D11RasterizerState* sky_rasterizer_state_;
+  ve::InputLayout sky_il_,clouds_il_;
+	uint32_t sky_index_count;
 	ModelViewProjectionConstantBuffer sky_vs_cb0_data;
   SkyPSShaderCB1 sky_ps_cb1_data;
-  ve::PixelShader ps_;
-  ve::VertexShader vs_;
+  ve::PixelShader sky_ps_;
+  ve::VertexShader sky_vs_;
+
+  ve::Texture clouds_tex_;
+  ve::ResourceView clouds_trv_;
+  ID3D11Buffer* clouds_ib_;
+  ID3D11Buffer* clouds_vb_;
+  ve::PixelShader clouds_ps_;
+  ve::VertexShader clouds_vs_;
+
 };
 
 }

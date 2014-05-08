@@ -21,10 +21,9 @@
 namespace demo {
 
 
-class Sprite;
 
 class SpriteBatch : public ve::RenderObject {
-  std::vector<Sprite*> render_list_;
+  std::vector<ve::Sprite*> render_list_;
   int max_sprite_count;
   ID3D11Buffer* vb;
   int Initialize(ve::Context* context) {
@@ -34,7 +33,7 @@ class SpriteBatch : public ve::RenderObject {
 		vertexBufferData.pSysMem = nullptr;//verticies;
 		vertexBufferData.SysMemPitch = 0;
 		vertexBufferData.SysMemSlicePitch = 0;
-		CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(VertexPositionColorTexture)*4*max_sprite_count, D3D11_BIND_VERTEX_BUFFER);
+		CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(ve::VertexPositionColorTexture)*4*max_sprite_count, D3D11_BIND_VERTEX_BUFFER);
 		context->CreateBuffer(&vertexBufferDesc,nullptr,(void**)&vb);
     world_ = dx::XMMatrixIdentity();
     dirty_ = 0xffffffff;
@@ -42,100 +41,13 @@ class SpriteBatch : public ve::RenderObject {
   }
 
   int Render() {
-	  UINT stride = sizeof(VertexPositionColorTexture);
+	  UINT stride = sizeof(ve::VertexPositionColorTexture);
 	  UINT offset = 0;
     context_->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     context_->SetVertexBuffers(0,1,(const void**)&vb,&stride,&offset);
     context_->Draw(4,0);
     return S_OK;
   }
-};
-
-__declspec(align(16))
-class Sprite : public ve::RenderObject {
-
- public:
-  void *operator new( size_t stAllocateBlock) {
-    return _aligned_malloc(sizeof(Sprite),16);
-  }
-
-  void   operator delete (void* p)  {
-    return _aligned_free(p);
-  }
-
-  Sprite() : ve::RenderObject(),x_(0),y_(0),w_(1),h_(1),u0_(0),v0_(0),u1_(1.0f),v1_(1.0f),scale_(1.0f),color_(dx::XMFLOAT3(1, 1, 1)),angle_(0) {
-    
-  }
-
-  int Initialize(ve::Context* context) {
-    ve::RenderObject::Initialize(context);
-		D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
-		vertexBufferData.pSysMem = nullptr;//verticies;
-		vertexBufferData.SysMemPitch = 0;
-		vertexBufferData.SysMemSlicePitch = 0;
-		CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(VertexPositionColorTexture)*4, D3D11_BIND_VERTEX_BUFFER);
-		context->CreateBuffer(&vertexBufferDesc,nullptr,(void**)&vb);
-
-    world_ = dx::XMMatrixIdentity();
-    dirty_ = 0xffffffff;
-    UpdateVerticies();
-    UpdateTransform();
-    return S_OK;
-  }
-
-   int Deinitialize() {
-    SafeRelease(&vb);
-    return ve::RenderObject::Deinitialize();
-  }
-
-  int UpdateVerticies() {
-    if (dirty_&ve::kRenderObjectDirtySize) {
-      dirty_ &= ~ve::kRenderObjectDirtySize;
-      VertexPositionColorTexture verticies[] = 
-		  {
-			  {dx::XMFLOAT3( 0.0f,  0.0f, 0.0f) , dx::XMFLOAT3(1, 1, 1) , dx::XMFLOAT2(u0_,v0_)},
-			  {dx::XMFLOAT3( w_,    0.0f, 0.0f) , dx::XMFLOAT3(1, 1, 1) , dx::XMFLOAT2(u1_,v0_)},
-			  {dx::XMFLOAT3( 0.0f,  h_,   0.0f) , dx::XMFLOAT3(1, 1, 1) , dx::XMFLOAT2(u0_,v1_)},
-			  {dx::XMFLOAT3( w_,    h_,   0.0f) , color_ , dx::XMFLOAT2(u1_,v1_)},
-
-		  };
-      return context_->CopyToVertexBuffer((void*)vb,verticies,sizeof(VertexPositionColorTexture),0,4);
-    } else return S_FALSE;
-  }
-
-  int UpdateTransform() {
-	  if (dirty_&ve::kRenderObjectDirtyTransform) {
-        dirty_ &= ~ve::kRenderObjectDirtyTransform;
-        world_ = dx::XMMatrixAffineTransformation2D(dx::XMVectorSet(scale_,scale_,1,0),
-                dx::XMVectorSet(w_/2.0f,h_/2.0f,0,0),angle_,dx::XMVectorSet(x_,y_,0,0));
-      return S_OK;
-    } else return S_FALSE;
-  }
- 
-
-  int Update(float timeTotal, float timeDelta) {
-    UpdateVerticies();
-    UpdateTransform();
-    return S_OK;
-  }
-
-  int Render() {
-	  UINT stride = sizeof(VertexPositionColorTexture);
-	  UINT offset = 0;
-    context_->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    context_->SetVertexBuffers(0,1,(const void**)&vb,&stride,&offset);
-    context_->Draw(4,0);
-    return S_OK;
-  }
-
-  void set_angle(float angle) { angle_ = angle; dirty_ |= ve::kRenderObjectDirtyTransform; }
-  void set_position(float x, float y) { x_ = x; y_ = y; dirty_ |= ve::kRenderObjectDirtyTransform; }
- private:
-	ID3D11Buffer* vb;
-  float x_,y_,w_,h_,angle_,scale_;
-  float u0_,v0_,u1_,v1_;
-  dx::XMFLOAT3 color_;
-
 };
 
 
@@ -153,7 +65,7 @@ class LoadingScene : public ve::Scene {
 
  public:
   ve::ContextD3D11* gfx;
-  Sprite sprite_;
+  ve::Sprite sprite_;
   float aspectRatio;
   //required for the dx::XMMatrix in the camera
   void *operator new( size_t stAllocateBlock) {
@@ -190,12 +102,17 @@ class LoadingScene : public ve::Scene {
   concurrency::task<int> LoadAsync() {
 
    
-    static auto filename1 = (ve::GetExePath() + "\\vs_tex.cso");
-    auto loadVSTask = ve::ReadDataAsync(filename1.c_str());
+    //static auto filename1 = (ve::GetExePath() + "\\vs_tex.cso");
+    //auto loadVSTask = ve::ReadDataAsync(filename1.c_str());
+
     static auto filename2 = (ve::GetExePath() + "\\ps_sky.cso");
     auto loadPSTask = ve::ReadDataAsync(filename2.c_str());
 
-	  auto createVSTask = loadVSTask.then([this](ve::FileData fd){
+    auto vs_result = context_->shader_manager().RequestVertexShader("vs_tex.cso",ve::VertexPositionColorTextureElementDesc,ARRAYSIZE(ve::VertexPositionColorTextureElementDesc));
+    vs_ = vs_result.vs;
+    m_inputLayout = (ID3D11InputLayout*)vs_result.il.pointer();
+
+	  /*auto createVSTask = loadVSTask.then([this](ve::FileData fd){
       if (fd.data != nullptr) {
         gfx->CreateVertexShader(fd.data,fd.length,vs_);
       
@@ -204,8 +121,8 @@ class LoadingScene : public ve::Scene {
 
 		    ThrowIfFailed(
 			    gfx->device()->CreateInputLayout(
-				    VertexPositionColorTextureElementDesc,
-				    ARRAYSIZE(VertexPositionColorTextureElementDesc),
+				    ve::VertexPositionColorTextureElementDesc,
+				    ARRAYSIZE(ve::VertexPositionColorTextureElementDesc),
 				    fd.data,
 				    fd.length,
 				    &m_inputLayout
@@ -213,7 +130,7 @@ class LoadingScene : public ve::Scene {
 			    );
           SafeDeleteArray(&fd.data);
       }
-    });
+    });*/
 
  
 
@@ -237,7 +154,7 @@ class LoadingScene : public ve::Scene {
 
 
 
-    auto createCubeTask = (createPSTask && createVSTask).then([this] () {
+    auto createCubeTask = (createPSTask ).then([this] () {
       
       //gfx->CreateTexture(256,256,DXGI_FORMAT_R8G8B8A8_UNORM,0,texture_);
       //gfx->CreateResourceView(texture_,trv);
@@ -255,7 +172,7 @@ class LoadingScene : public ve::Scene {
 
         //gfx->device_context()->PSSetSamplers( 0, 1, &sampler_state );
 
-		  VertexPositionColorTexture cubeVertices[] = 
+		  ve::VertexPositionColorTexture cubeVertices[] = 
 		  {
 			  {dx::XMFLOAT3( 0.0f,  0.0f, 0.0f), dx::XMFLOAT3(1, 1, 1),dx::XMFLOAT2(0,0)},
 			  {dx::XMFLOAT3( aspectRatio,  0.0f, 0.0f), dx::XMFLOAT3(1, 1, 1),dx::XMFLOAT2(1,0)},
@@ -337,6 +254,11 @@ class LoadingScene : public ve::Scene {
     return S_OK;
   }
 
+  int Unset() {
+
+    return S_OK;
+  }
+
   int Update(float timeTotal, float timeDelta) {
     (void) timeDelta; // Unused parameter.
 
@@ -379,7 +301,7 @@ dx::XMVectorSet(0,0,0,0))));
 	  gfx->device_context()->UpdateSubresource(m_constantBuffer,0,NULL,&m_constantBufferData,0,0);
     gfx->device_context()->UpdateSubresource(ps_cb0,0,NULL,&ps_cb0_data,0,0);
     gfx->device_context()->UpdateSubresource(ps_cb1,0,NULL,&ps_cb1_data,0,0);
-	  UINT stride = sizeof(VertexPositionColorTexture);
+	  UINT stride = sizeof(ve::VertexPositionColorTexture);
 	  UINT offset = 0;
     gfx->device_context()->IASetIndexBuffer(m_indexBuffer,DXGI_FORMAT_R16_UINT,0);
 	  gfx->device_context()->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride,&offset);
@@ -405,7 +327,7 @@ dx::XMVectorSet(0,0,0,0))));
  private:
 	bool m_loadingComplete;
   ve::OrthoCamera camera_;
-  FirstPersonCamera _1st_person_cam1;
+  ve::FirstPersonCamera _1st_person_cam1;
 	ID3D11InputLayout* m_inputLayout;
 	ID3D11Buffer* m_vertexBuffer;
 	ID3D11Buffer* m_indexBuffer;

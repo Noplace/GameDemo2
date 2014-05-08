@@ -29,6 +29,7 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
+__declspec(align(16))
 struct ModelViewProjectionConstantBuffer
 {
 	dx::XMFLOAT4X4 model;
@@ -36,32 +37,12 @@ struct ModelViewProjectionConstantBuffer
 	dx::XMFLOAT4X4 projection;
 };
 
-
-struct VertexPositionColor
-{
-	dx::XMFLOAT3 pos;
-	dx::XMFLOAT3 color;
+__declspec(align(16))
+struct TimeConstantBuffer {
+	float totalTime;
+  float deltaTime;
 };
 
-const D3D11_INPUT_ELEMENT_DESC VertexPositionColorElementDesc[] = 
-{
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	{ "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-};
-
-struct VertexPositionColorTexture
-{
-	dx::XMFLOAT3 pos;
-	dx::XMFLOAT3 color;
-  dx::XMFLOAT2 uv;
-};
-
-const D3D11_INPUT_ELEMENT_DESC VertexPositionColorTextureElementDesc[] = 
-{
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	{ "COLOR",    0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-  { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-};
 
 class Renderer {
  public:

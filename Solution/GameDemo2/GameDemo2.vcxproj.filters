@@ -56,9 +56,6 @@
     <ClInclude Include="Code\terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Code\first_person_camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Code\sky.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -76,6 +73,8 @@
     <FxCompile Include="Resources\ps_flappybird.hlsl" />
     <FxCompile Include="Resources\ps_fractal.hlsl" />
     <FxCompile Include="Resources\ps_sky.hlsl" />
+    <FxCompile Include="Resources\ps_clouds.hlsl" />
+    <FxCompile Include="Resources\vs_clouds.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\cog.png">
@@ -84,5 +83,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ps_global.hlsli" />
+    <None Include="Resources\vs_global.hlsli" />
+    <None Include="Resources\noise.hlsli" />
+    <None Include="Resources\simplex_noise.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Resources\test.json" />
   </ItemGroup>
 </Project>

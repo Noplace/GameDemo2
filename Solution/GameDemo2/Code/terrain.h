@@ -29,9 +29,13 @@ class Terrain : public ve::RenderObject {
     return _aligned_malloc(sizeof(Terrain),16);
   }
 
-   void   operator delete (void* p)  {
-      return _aligned_free(p);
-   }
+  void   operator delete (void* p)  {
+    return _aligned_free(p);
+  }
+  Terrain() : ve::RenderObject(),terrain_width_(50),terrain_depth_(50),terrain_quad_size_(1.0f) {
+
+  }
+
   int Initialize(ve::Context* context);
   int Deinitialize();
   concurrency::task<int> LoadAsync();
@@ -40,8 +44,18 @@ class Terrain : public ve::RenderObject {
   int UpdateTransform() { return S_OK; }
   int Update(float timeTotal, float timeDelta);
   int Render();
+
+
+  int terrain_width() { return terrain_width_; }
+  int terrain_depth() { return terrain_depth_; }
+  float terrain_quad_size() { return terrain_quad_size_; }
+  void set_terrain_width(int terrain_width) { terrain_width_ = terrain_width; }
+  void set_terrain_depth(int terrain_depth) { terrain_depth_ = terrain_depth; }
+  void set_terrain_quad_size(float terrain_quad_size) { terrain_quad_size_ = terrain_quad_size; }
  private:
 	int status;
+  int terrain_width_,terrain_depth_;
+  float terrain_quad_size_;
 	ID3D11Buffer* vb;
 	ID3D11Buffer* ib;
 	//ID3D11Buffer* cb;
@@ -51,6 +65,7 @@ class Terrain : public ve::RenderObject {
   ve::HullShader hs_;//ps_,ds_,hs_,gs_;
   ve::DomainShader ds_;
   ve::VertexShader vs_;
+  ID3D11RasterizerState * terrain_rasterizer_state_ ;
 };
 
 }

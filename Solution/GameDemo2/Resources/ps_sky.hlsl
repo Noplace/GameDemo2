@@ -119,7 +119,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
   float3 sunDirection = normalize(float3(-(0.5)*2., -1, (0.5)*2.));
 	float2 resolution = float2(1,1);
     // General parameter setup
-  //input.uv.y = 1 - input.uv.y;
+  //input.uv.x = 1 - input.uv.x;
 	float2 vPos = 2.0*input.uv/resolution - 1.0; 					// map vPos to -1..1
 	//float t = totalTime*0.0;									// time value, used to animate stuff
 	float screenAspectRatio = resolution.x/resolution.y;					// the aspect ratio of the screen (e.g. 16:9)

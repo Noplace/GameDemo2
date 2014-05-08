@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <VisualEssence/Code/ve.h>
-#include "first_person_camera.h"
 #include "timer.h"
 #include "renderer.h"
 #include "client_main_window.h"

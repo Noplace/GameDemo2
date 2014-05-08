@@ -3,15 +3,13 @@
 struct VertexShaderInput
 {
 	float3 pos : POSITION;
-	float3 color : COLOR0;
-  float2 uv : TEXCOORD0;
+  float3 uvw : TEXCOORD0;
 };
 
 struct VertexShaderOutput
 {
 	float4 pos : SV_POSITION;
-	float3 color : COLOR0;
-  float2 uv : TEXCOORD0;
+  float3 uvw : TEXCOORD0;
 };
 
 VertexShaderOutput main(VertexShaderInput input)
@@ -25,8 +23,6 @@ VertexShaderOutput main(VertexShaderInput input)
 	pos = mul(pos, projection);
 	output.pos = pos;
 
-	// Pass through the color without modification.
-	output.color = input.color;
-  output.uv = input.uv;
+  output.uvw = input.uvw;
 	return output;
 }
