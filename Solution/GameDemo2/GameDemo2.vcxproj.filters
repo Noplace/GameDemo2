@@ -86,6 +86,8 @@
     <None Include="Resources\vs_global.hlsli" />
     <None Include="Resources\noise.hlsli" />
     <None Include="Resources\simplex_noise.hlsli" />
+    <None Include="Resources\raymarch.hlsli" />
+    <None Include="Resources\clouds.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\test.json" />

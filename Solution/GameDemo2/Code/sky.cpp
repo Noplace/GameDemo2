@@ -238,7 +238,7 @@ concurrency::task<int> Sky::LoadAsync() {
       //gfx->CreateTexture(256,256,DXGI_FORMAT_R8G8B8A8_UNORM,1,clouds_tex_);
       //gfx->CreateResourceView(clouds_tex_,clouds_trv_);
 
-      DirectX::CreateDDSTextureFromFile(gfx->device(),L"C:\\Users\\U11111\\Downloads\\flame.dds",(ID3D11Resource**)&clouds_tex_.data_pointer,(ID3D11ShaderResourceView**)&clouds_trv_.data_pointer);
+      //DirectX::CreateDDSTextureFromFile(gfx->device(),L"C:\\Users\\U11111\\Downloads\\flame.dds",(ID3D11Resource**)&clouds_tex_.data_pointer,(ID3D11ShaderResourceView**)&clouds_trv_.data_pointer);
 
 
 
@@ -253,6 +253,11 @@ concurrency::task<int> Sky::LoadAsync() {
 			  {dx::XMFLOAT3( 0.5f,  0.5f, -0.5f), dx::XMFLOAT3(1.0f, 1.0f, 0.0f)},
 			  {dx::XMFLOAT3( 0.5f,  0.5f,  0.5f), dx::XMFLOAT3(1.0f, 1.0f, 1.0f)},
 		  };
+      for (auto i = 0; i < 8; ++i) {
+        cubeVertices[i].pos.x *= 4.0f; 
+        cubeVertices[i].pos.y *= 4.0f; 
+        cubeVertices[i].pos.z *= 4.0f; 
+      }
       unsigned short cubeIndices[] = 
 		  {
 			  0,2,1, // -x
@@ -470,7 +475,8 @@ concurrency::task<int> Sky::LoadAsync() {
     context_->PopVertexShader();
 
 
-    scene_->UpdateWorldMatrix(dx::XMMatrixTranspose(dx::XMMatrixTranslation(0,2,0)));
+    scene_->UpdateWorldMatrix(dx::XMMatrixTranspose(dx::XMMatrixTranslation(0,12,0)));
+    //scene_->UpdateWorldMatrix(dx::XMMatrixTranspose(dx::XMMatrixIdentity()));
     context_->SetInputLayout(clouds_il_);
     context_->PushVertexShader(&clouds_vs_);
     context_->PushPixelShader(&clouds_ps_);

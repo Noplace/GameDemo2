@@ -35,6 +35,7 @@ struct ModelViewProjectionConstantBuffer
 	dx::XMFLOAT4X4 model;
 	dx::XMFLOAT4X4 view;
 	dx::XMFLOAT4X4 projection;
+  dx::XMFLOAT4X4 viewInv;
 };
 
 __declspec(align(16))

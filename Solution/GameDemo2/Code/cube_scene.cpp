@@ -33,7 +33,7 @@ int CubeScene::Initialize(ve::Context* context) {
 	float fovAngleY = 70.0f * dx::XM_PI / 180.0f;
   camera_.BuildProjectionMatrix(fovAngleY,aspectRatio,0.01f,100.0f);
   dx::XMStoreFloat4x4(&vs_cb0_data.projection,camera_.projection_transposed());
-  camera_.camPosition = dx::XMVectorSet(0,10,3,0);
+  camera_.camPosition = dx::XMVectorSet(0,4,9,0);
   
 
   terrain_ = new Terrain();
@@ -45,7 +45,7 @@ int CubeScene::Initialize(ve::Context* context) {
   sky_->Initialize(context);
 
   AddRenderObject(sky_);
-  AddRenderObject(terrain_);
+  //AddRenderObject(terrain_);
 
     
   return hr;
@@ -292,6 +292,8 @@ int CubeScene::Update(float timeTotal, float timeDelta) {
   vs_cb1_data.deltaTime = timeDelta;
   vs_cb1_data.totalTime = timeTotal;
 	dx::XMStoreFloat4x4(&vs_cb0_data.view, camera_.view_transposed());
+  dx::XMStoreFloat4x4(&vs_cb0_data.viewInv, (dx::XMMatrixInverse(nullptr,camera_.view())));
+
 	dx::XMStoreFloat4x4(&vs_cb0_data.model, dx::XMMatrixTranspose(dx::XMMatrixRotationY(timeTotal * dx::XM_PIDIV4)));
   dx::XMStoreFloat4x4(&vs_cb0_data.model, dx::XMMatrixTranspose(dx::XMMatrixIdentity()));
   gfx->device_context()->UpdateSubresource(vs_cb0,0,NULL,&vs_cb0_data,0,0);

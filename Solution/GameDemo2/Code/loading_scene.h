@@ -158,7 +158,7 @@ class LoadingScene : public ve::Scene {
       
       //gfx->CreateTexture(256,256,DXGI_FORMAT_R8G8B8A8_UNORM,0,texture_);
       //gfx->CreateResourceView(texture_,trv);
-      DirectX::CreateWICTextureFromFile(gfx->device(),L"D:\\Personal\\Projects\\GameDemo2\\Solution\\GameDemo2\\Resources\\cog.png",(ID3D11Resource**)&texture_.data_pointer,(ID3D11ShaderResourceView**)&trv.data_pointer);
+      //DirectX::CreateWICTextureFromFile(gfx->device(),L"D:\\Personal\\Projects\\GameDemo2\\Solution\\GameDemo2\\Resources\\cog.png",(ID3D11Resource**)&texture_.data_pointer,(ID3D11ShaderResourceView**)&trv.data_pointer);
         D3D11_SAMPLER_DESC sampDesc;
         ZeroMemory( &sampDesc, sizeof(sampDesc) );
         sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -310,7 +310,7 @@ dx::XMVectorSet(0,0,0,0))));
 	  gfx->device_context()->VSSetConstantBuffers(0,1,&m_constantBuffer);
     gfx->device_context()->PSSetConstantBuffers(0,1,&ps_cb0);
     gfx->device_context()->PSSetConstantBuffers(1,1,&ps_cb1);
-    gfx->SetShaderResources(ve::ShaderType::kShaderTypePixel,0,1,&trv.data_pointer);
+    //gfx->SetShaderResources(ve::ShaderType::kShaderTypePixel,0,1,&trv.data_pointer);
 	  //gfx->device_context()->DrawIndexed(m_indexCount,0,0);
 
     for (auto i=render_list_.begin(); i != render_list_.end(); ++i) {

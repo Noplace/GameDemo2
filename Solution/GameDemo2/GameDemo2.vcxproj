@@ -173,8 +173,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\clouds.hlsli" />
     <None Include="Resources\noise.hlsli" />
     <None Include="Resources\ps_global.hlsli" />
+    <None Include="Resources\raymarch.hlsli" />
     <None Include="Resources\simplex_noise.hlsli" />
     <None Include="Resources\vs_global.hlsli" />
   </ItemGroup>
