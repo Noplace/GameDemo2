@@ -21,6 +21,8 @@
 
 namespace demo {
 
+
+
 int permutation[256];
 // gradients for 3d noise
   const float gradients[16][3] =  
@@ -208,9 +210,9 @@ concurrency::task<int> Sky::LoadAsync() {
   return concurrency::create_task([this](){
     auto gfx = (ve::ContextD3D11*)context_;
 
+    
 
-
-    auto sky_vs_result = context_->shader_manager().RequestVertexShader("vs_tex.cso",ve::VertexPositionColorTextureElementDesc,ARRAYSIZE(ve::VertexPositionColorTextureElementDesc));
+    auto sky_vs_result = context_->shader_manager().RequestVertexShader("vs_sky.cso",ve::VertexPositionColorTextureElementDesc,ARRAYSIZE(ve::VertexPositionColorTextureElementDesc));
     sky_vs_ = sky_vs_result.vs;
     sky_il_ = sky_vs_result.il;
     auto sky_ps_result = context_->shader_manager().RequestPixelShader("ps_sky.cso");
@@ -244,20 +246,20 @@ concurrency::task<int> Sky::LoadAsync() {
 
 		  ve::VertexPositionColor cubeVertices[] = 
 		  {
-			  {dx::XMFLOAT3(-0.5f, -0.5f, -0.5f), dx::XMFLOAT3(0.0f, 0.0f, 0.0f)},
-			  {dx::XMFLOAT3(-0.5f, -0.5f,  0.5f), dx::XMFLOAT3(0.0f, 0.0f, 1.0f)},
-			  {dx::XMFLOAT3(-0.5f,  0.5f, -0.5f), dx::XMFLOAT3(0.0f, 1.0f, 0.0f)},
-			  {dx::XMFLOAT3(-0.5f,  0.5f,  0.5f), dx::XMFLOAT3(0.0f, 1.0f, 1.0f)},
-			  {dx::XMFLOAT3( 0.5f, -0.5f, -0.5f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f)},
-			  {dx::XMFLOAT3( 0.5f, -0.5f,  0.5f), dx::XMFLOAT3(1.0f, 0.0f, 1.0f)},
-			  {dx::XMFLOAT3( 0.5f,  0.5f, -0.5f), dx::XMFLOAT3(1.0f, 1.0f, 0.0f)},
-			  {dx::XMFLOAT3( 0.5f,  0.5f,  0.5f), dx::XMFLOAT3(1.0f, 1.0f, 1.0f)},
+			  {dx::XMFLOAT3(-1.0f, -1.0f, -1.0f), dx::XMFLOAT3(0.0f, 0.0f, 0.0f)},
+			  {dx::XMFLOAT3(-1.0f, -1.0f,  1.0f), dx::XMFLOAT3(0.0f, 0.0f, 1.0f)},
+			  {dx::XMFLOAT3(-1.0f,  1.0f, -1.0f), dx::XMFLOAT3(0.0f, 1.0f, 0.0f)},
+			  {dx::XMFLOAT3(-1.0f,  1.0f,  1.0f), dx::XMFLOAT3(0.0f, 1.0f, 1.0f)},
+			  {dx::XMFLOAT3( 1.0f, -1.0f, -1.0f), dx::XMFLOAT3(1.0f, 0.0f, 0.0f)},
+			  {dx::XMFLOAT3( 1.0f, -1.0f,  1.0f), dx::XMFLOAT3(1.0f, 0.0f, 1.0f)},
+			  {dx::XMFLOAT3( 1.0f,  1.0f, -1.0f), dx::XMFLOAT3(1.0f, 1.0f, 0.0f)},
+			  {dx::XMFLOAT3( 1.0f,  1.0f,  1.0f), dx::XMFLOAT3(1.0f, 1.0f, 1.0f)},
 		  };
-      for (auto i = 0; i < 8; ++i) {
-        cubeVertices[i].pos.x *= 4.0f; 
-        cubeVertices[i].pos.y *= 4.0f; 
-        cubeVertices[i].pos.z *= 4.0f; 
-      }
+      /*for (auto i = 0; i < 8; ++i) {
+        cubeVertices[i].pos.x *= 2.0f; 
+        cubeVertices[i].pos.y *= 2.0f; 
+        cubeVertices[i].pos.z *= 2.0f; 
+      }*/
       unsigned short cubeIndices[] = 
 		  {
 			  0,2,1, // -x
@@ -385,8 +387,8 @@ concurrency::task<int> Sky::LoadAsync() {
       depthDisabledStencilDesc.DepthEnable = false;
 	    depthDisabledStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	    depthDisabledStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	    depthDisabledStencilDesc.StencilEnable = true;
-	    depthDisabledStencilDesc.StencilReadMask = 0xFF;
+	    depthDisabledStencilDesc.StencilEnable = false;
+	    /*depthDisabledStencilDesc.StencilReadMask = 0xFF;
 	    depthDisabledStencilDesc.StencilWriteMask = 0xFF;
 	    depthDisabledStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	    depthDisabledStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
@@ -395,7 +397,7 @@ concurrency::task<int> Sky::LoadAsync() {
 	    depthDisabledStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	    depthDisabledStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 	    depthDisabledStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	    depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+	    depthDisabledStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;*/
 	    auto hr = gfx->device()->CreateDepthStencilState(&depthDisabledStencilDesc, &sky_depth_state_);
 
       D3D11_RASTERIZER_DESC rasterDesc;
@@ -403,10 +405,10 @@ concurrency::task<int> Sky::LoadAsync() {
 	    rasterDesc.CullMode = D3D11_CULL_NONE;
 	    rasterDesc.DepthBias = 0;
 	    rasterDesc.DepthBiasClamp = 0.0f;
-	    rasterDesc.DepthClipEnable = true;
+	    rasterDesc.DepthClipEnable = false;
 	    rasterDesc.FillMode = D3D11_FILL_SOLID;
 	    rasterDesc.FrontCounterClockwise = false;
-	    rasterDesc.MultisampleEnable = false;
+	    rasterDesc.MultisampleEnable = true;
 	    rasterDesc.ScissorEnable = false;
 	    rasterDesc.SlopeScaledDepthBias = 0.0f;
 
@@ -423,6 +425,8 @@ concurrency::task<int> Sky::LoadAsync() {
 
   concurrency::task<int> Sky::UnloadAsync() {
     return concurrency::create_task([this](){
+      
+
       context_->DestoryInputLayout(sky_il_);
       SafeRelease(&sky_vb_);
       SafeRelease(&sky_ib_);
@@ -448,6 +452,8 @@ concurrency::task<int> Sky::LoadAsync() {
   int Sky::Update(float timeTotal, float timeDelta) {
     (void) timeDelta; // Unused parameter.
 
+    //
+
     return S_OK;
   }
 
@@ -456,8 +462,8 @@ concurrency::task<int> Sky::LoadAsync() {
 	  {
 		  return S_FALSE;
 	  }
-
-    context_->SetInputLayout(sky_il_);
+    
+    /*context_->SetInputLayout(sky_il_);
     context_->PushVertexShader(&sky_vs_);
     //context_->PushPixelShader(&sky_ps_);
 	  UINT stride = sizeof(ve::VertexPositionColorTexture);
@@ -475,8 +481,10 @@ concurrency::task<int> Sky::LoadAsync() {
     context_->PopVertexShader();
 
 
-    scene_->UpdateWorldMatrix(dx::XMMatrixTranspose(dx::XMMatrixTranslation(0,12,0)));
     //scene_->UpdateWorldMatrix(dx::XMMatrixTranspose(dx::XMMatrixIdentity()));
+    auto cloud_world = dx::XMMatrixScaling(10,1,10)*dx::XMMatrixTranslation(0,12,0);
+    scene_->UpdateWorldMatrix(dx::XMMatrixTranspose(cloud_world));
+    
     context_->SetInputLayout(clouds_il_);
     context_->PushVertexShader(&clouds_vs_);
     context_->PushPixelShader(&clouds_ps_);
@@ -488,9 +496,11 @@ concurrency::task<int> Sky::LoadAsync() {
     uint32_t strides[] = { sizeof(ve::VertexPositionTexture3D)};
     context_->SetVertexBuffers(0,1,(const void**)&clouds_vb_,strides,&offset);
     gfx->device_context()->IASetIndexBuffer(clouds_ib_,DXGI_FORMAT_R16_UINT,0);
-    gfx->device_context()->DrawIndexed(36,0,0);
-    context_->PopPixelShader();
+    gfx->DrawIndexed(36,0,0);
     context_->PopVertexShader();
+    context_->PopPixelShader();
+  */
+
     return S_OK;
   }
 

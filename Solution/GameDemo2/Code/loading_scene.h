@@ -18,38 +18,9 @@
 *****************************************************************************************************************/
 #include <VisualEssence/Code/util/WICTextureLoader.h>
 
+
+
 namespace demo {
-
-
-
-class SpriteBatch : public ve::RenderObject {
-  std::vector<ve::Sprite*> render_list_;
-  int max_sprite_count;
-  ID3D11Buffer* vb;
-  int Initialize(ve::Context* context) {
-    max_sprite_count = 1000;
-    ve::RenderObject::Initialize(context);
-		D3D11_SUBRESOURCE_DATA vertexBufferData = {0};
-		vertexBufferData.pSysMem = nullptr;//verticies;
-		vertexBufferData.SysMemPitch = 0;
-		vertexBufferData.SysMemSlicePitch = 0;
-		CD3D11_BUFFER_DESC vertexBufferDesc(sizeof(ve::VertexPositionColorTexture)*4*max_sprite_count, D3D11_BIND_VERTEX_BUFFER);
-		context->CreateBuffer(&vertexBufferDesc,nullptr,(void**)&vb);
-    world_ = dx::XMMatrixIdentity();
-    dirty_ = 0xffffffff;
-    UpdateTransform();
-  }
-
-  int Render() {
-	  UINT stride = sizeof(ve::VertexPositionColorTexture);
-	  UINT offset = 0;
-    context_->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-    context_->SetVertexBuffers(0,1,(const void**)&vb,&stride,&offset);
-    context_->Draw(4,0);
-    return S_OK;
-  }
-};
-
 
 
 __declspec(align(16))
@@ -81,15 +52,33 @@ class LoadingScene : public ve::Scene {
     gfx = (ve::ContextD3D11*)context;
     camera_.Initialize(gfx);
     
-    aspectRatio = float(gfx->width()) / float(gfx->height());
-    camera_.BuildProjectionMatrix(aspectRatio);
-  	dx::XMStoreFloat4x4(&m_constantBufferData.projection,camera_.projection_transposed());
-    _1st_person_cam1.Initialize(context);
+    //_1st_person_cam1.Initialize(context);
     
 
     sprite_.Initialize(context);
     sprite_.set_opacity(0.5);
-    AddRenderObject(&sprite_);
+    
+    sprite_batch_.Initialize(context_);
+    AddRenderObject(&sprite_batch_);
+
+    srand(time(0));
+    for (int i=0;i<1000;++i)     {
+      int x1 = rand() % 1000;
+      int y1 = rand() % 1000;
+      sprite_list[i] = new ve::SpriteBatchSprite();
+      sprite_list[i]->Initialize(context);
+      sprite_batch_.AddSprite(sprite_list[i]);
+      sprite_list[i]->set_size(50.0f,50.0f);
+      sprite_list[i]->set_rotation_origin(dx::XMFLOAT2(25.0f,25.0f));
+      sprite_list[i]->set_position(x1,y1);
+      sprite_list[i]->set_opacity(0.8f);
+  
+    }
+
+
+
+    //AddRenderObject(&sprite_);
+    
     return hr;
   }
 
@@ -99,13 +88,22 @@ class LoadingScene : public ve::Scene {
     return S_OK;
   }
 
+   int OnWindowSizeChange() { 
+    aspectRatio = float(gfx->width()) / float(gfx->height());
+    camera_.BuildProjectionMatrix(float(gfx->width()) , float(gfx->height()));
+  	dx::XMStoreFloat4x4(&m_constantBufferData.projection,camera_.projection_transposed());
+    for (auto i : render_list_)
+      i->OnWindowSizeChange();
+    return S_OK; 
+   }
+
   concurrency::task<int> LoadAsync() {
 
    
     //static auto filename1 = (ve::GetExePath() + "\\vs_tex.cso");
     //auto loadVSTask = ve::ReadDataAsync(filename1.c_str());
 
-    static auto filename2 = (ve::GetExePath() + "\\ps_sky.cso");
+    static auto filename2 = (ve::GetExePath() + "\\ps_clouds2.cso");
     auto loadPSTask = ve::ReadDataAsync(filename2.c_str());
 
     auto vs_result = context_->shader_manager().RequestVertexShader("vs_tex.cso",ve::VertexPositionColorTextureElementDesc,ARRAYSIZE(ve::VertexPositionColorTextureElementDesc));
@@ -156,9 +154,11 @@ class LoadingScene : public ve::Scene {
 
     auto createCubeTask = (createPSTask ).then([this] () {
       
+      
+
       //gfx->CreateTexture(256,256,DXGI_FORMAT_R8G8B8A8_UNORM,0,texture_);
       //gfx->CreateResourceView(texture_,trv);
-      //DirectX::CreateWICTextureFromFile(gfx->device(),L"D:\\Personal\\Projects\\GameDemo2\\Solution\\GameDemo2\\Resources\\cog.png",(ID3D11Resource**)&texture_.data_pointer,(ID3D11ShaderResourceView**)&trv.data_pointer);
+      DirectX::CreateWICTextureFromFile(gfx->device(),L"D:\\Personal\\Projects\\GameDemo2\\Solution\\GameDemo2\\Resources\\cog.png",(ID3D11Resource**)&texture_.data_pointer,(ID3D11ShaderResourceView**)&trv.data_pointer);
         D3D11_SAMPLER_DESC sampDesc;
         ZeroMemory( &sampDesc, sizeof(sampDesc) );
         sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -170,7 +170,7 @@ class LoadingScene : public ve::Scene {
         sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
         int hr = gfx->device()->CreateSamplerState( &sampDesc, &sampler_state );
 
-        //gfx->device_context()->PSSetSamplers( 0, 1, &sampler_state );
+        gfx->device_context()->PSSetSamplers( 0, 1, &sampler_state );
 
 		  ve::VertexPositionColorTexture cubeVertices[] = 
 		  {
@@ -232,6 +232,7 @@ class LoadingScene : public ve::Scene {
       gfx->DestroyTexture(texture_);
       gfx->DestroyResourceView(trv);
       SafeRelease(&sampler_state);
+      sprite_batch_.Deinitialize();
 
       SafeRelease(&m_constantBuffer);
       SafeRelease(&ps_cb1);
@@ -246,6 +247,15 @@ class LoadingScene : public ve::Scene {
 
   POINT mouse_last,mouse_current;
   int Set() {
+
+    //temp    
+    CD3D11_DEFAULT d;
+    CD3D11_RASTERIZER_DESC rDesc(d);
+    rDesc.FillMode = D3D11_FILL_WIREFRAME ; // change the ONE setting
+    ID3D11RasterizerState* rs_state;
+    gfx->device()->CreateRasterizerState( &rDesc, &rs_state ) ;
+    //gfx->device_context()->RSSetState(rs_state);
+    
     gfx->SetInputLayout(input_layout_);
     //gfx->device_context()->IASetInputLayout(m_inputLayout);
     gfx->SetShader(vs_);
@@ -263,14 +273,18 @@ class LoadingScene : public ve::Scene {
     (void) timeDelta; // Unused parameter.
 
 
-    _1st_person_cam1.Update(timeDelta);
+    
     camera_.BuildViewMatrix();
 	  dx::XMStoreFloat4x4(&m_constantBufferData.view, camera_.view_transposed());
+
+    /*_1st_person_cam1.Update(timeDelta);
     ps_cb1_data.cameraLookAt = _1st_person_cam1.camTarget;
     ps_cb1_data.cameraPosition = _1st_person_cam1.camPosition;
     ps_cb1_data.cameraUp = _1st_person_cam1.camUp;
     ps_cb1_data.cameraForward = _1st_person_cam1.camForward;
     ps_cb1_data.cameraRight = _1st_person_cam1.camRight;
+    */
+
     ps_cb0_data.deltaTime = timeDelta;
     ps_cb0_data.totalTime = timeTotal;
 
@@ -282,8 +296,15 @@ timeTotal,
 dx::XMVectorSet(0,0,0,0))));
 */
     //sprite_.set_position(sin(timeTotal),0);
+    float a = sin(timeTotal);
+      
+    
+    for (int i=0;i<1000;++i) {
+      //sprite_list[i]->set_color(dx::XMFLOAT3(1,0,1));
+      sprite_list[i]->set_opacity((a+1)/2);
+      sprite_list[i]->set_angle(a);
+    }
 
- 
     for (auto i=render_list_.begin(); i != render_list_.end(); ++i) {
       (*i)->Update(timeTotal,timeDelta);
     }
@@ -306,11 +327,11 @@ dx::XMVectorSet(0,0,0,0))));
     gfx->device_context()->IASetIndexBuffer(m_indexBuffer,DXGI_FORMAT_R16_UINT,0);
 	  gfx->device_context()->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride,&offset);
     
-	  gfx->device_context()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	  context_->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	  gfx->device_context()->VSSetConstantBuffers(0,1,&m_constantBuffer);
     gfx->device_context()->PSSetConstantBuffers(0,1,&ps_cb0);
     gfx->device_context()->PSSetConstantBuffers(1,1,&ps_cb1);
-    //gfx->SetShaderResources(ve::ShaderType::kShaderTypePixel,0,1,&trv.data_pointer);
+    gfx->SetShaderResources(ve::ShaderType::kShaderTypePixel,0,1,&trv.data_pointer);
 	  //gfx->device_context()->DrawIndexed(m_indexCount,0,0);
 
     for (auto i=render_list_.begin(); i != render_list_.end(); ++i) {
@@ -323,11 +344,11 @@ dx::XMVectorSet(0,0,0,0))));
 
     return S_OK;
   }
-
+  ve::Camera* camera() { return &camera_; }
  private:
 	bool m_loadingComplete;
   ve::OrthoCamera camera_;
-  ve::FirstPersonCamera _1st_person_cam1;
+  //ve::FirstPersonCamera _1st_person_cam1;
 	ID3D11InputLayout* m_inputLayout;
 	ID3D11Buffer* m_vertexBuffer;
 	ID3D11Buffer* m_indexBuffer;
@@ -341,7 +362,8 @@ dx::XMVectorSet(0,0,0,0))));
 	ModelViewProjectionConstantBuffer m_constantBufferData;
   LoadingScenePSCB ps_cb0_data;
   SkyPSShaderCB1 ps_cb1_data;
-
+  ve::SpriteBatch sprite_batch_;
+  ve::SpriteBatchSprite* sprite_list[1000];
 };
 
 }

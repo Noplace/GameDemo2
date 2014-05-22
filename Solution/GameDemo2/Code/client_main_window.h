@@ -46,6 +46,7 @@ class ClientMainWindow {
     DWORD style;  
   } display[2];
   int dispmode;
+  int fps_;
 
   static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };

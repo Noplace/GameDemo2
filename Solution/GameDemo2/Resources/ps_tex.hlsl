@@ -66,7 +66,7 @@ float4 main(PixelShaderInput input) : SV_TARGET
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
   textureColor = shaderTexture.Sample(SampleType, input.uv);
-  return textureColor * float4(1.0f,1.0f,1.0f,opacity);
+  return textureColor*float4(1.0f,1.0f,1.0f,opacity);
   //float p = CreatePerlinNoise(input.uv.x*100,input.uv.y*100);
   //float p = inoise(float3(input.uv,0));
  // float4 color = float4(p,p,p,1.0f);

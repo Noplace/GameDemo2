@@ -22,39 +22,6 @@ namespace demo {
 
 
 
-class ThirdPersonCamera : public ve::PrespectiveCamera {
- public:
-  dx::XMVECTOR at_vector;
-  dx::XMVECTOR pos_vector;
-  const dx::XMVECTOR up = dx::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-  ThirdPersonCamera() : ve::PrespectiveCamera() {
-    at_vector = dx::XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f);
-    pos_vector = dx::XMVectorSet(0.0f, 0.7f, 1.5f, 0.0f);
-    view_ = dx::XMMatrixIdentity();
-  }
-  void RotateCamera(float angle, float x, float y, float z) {
-    auto temp = dx::XMQuaternionRotationNormal(dx::XMVectorSet(x,y,z,0),angle);
-
-   
-    auto temp2 = dx::XMQuaternionMultiply(dx::XMQuaternionConjugate(temp),dx::XMQuaternionMultiply(temp,at_vector));
-    at_vector  = temp2;
-
-/*
-    auto axis = dx::XMVector3Cross(dx::XMVectorSubtract(at_vector,pos_vector), up);
-    axis = dx::XMVector3Normalize(axis);
-
-    view_ = dx::XMMatrixRotationAxis(axis,angle);*/
-    BuildViewMatrix(pos_vector,at_vector,up);
-  }
-
-  void Update() {
-    
-  }
-
-
-};
-
-
 class CubeScene : public ve::Scene {
 
  public:
@@ -79,21 +46,22 @@ class CubeScene : public ve::Scene {
   int Update(float timeTotal, float timeDelta);
   int Render();
   int UpdateWorldMatrix(const dx::XMMATRIX& world);
-
+  ve::Camera* camera() { return &camera_; }
  private:
 	bool m_loadingComplete;
   //ThirdPersonCamera camera_;
   ve::FirstPersonCamera camera_;
   ID3D11RasterizerState * scene_rasterizer_state_ ;
-	ID3D11Buffer* m_vertexBuffer;
-	ID3D11Buffer* m_indexBuffer;
-	ID3D11Buffer* vs_cb0;
-  ID3D11Buffer* vs_cb1;
+	//ID3D11Buffer* m_vertexBuffer;
+	//ID3D11Buffer* m_indexBuffer;
+  ID3D11Buffer* ps_cb;
+	ID3D11Buffer* vs_cb_list[3];
   ve::InputLayout input_layout_;
-	uint32_t m_indexCount;
+	//uint32_t m_indexCount;
 	ModelViewProjectionConstantBuffer vs_cb0_data;
   TimeConstantBuffer vs_cb1_data;
-  ve::Shader ds_,hs_,gs_;
+  ViewInverseConstantBuffer vs_cb2_data;
+  //ve::Shader ds_,hs_,gs_;
   Terrain* terrain_;
   Sky* sky_;
 };

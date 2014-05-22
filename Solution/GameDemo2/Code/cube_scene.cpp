@@ -27,13 +27,14 @@ namespace demo {
 int CubeScene::Initialize(ve::Context* context) {
   int hr = Scene::Initialize(context);
   gfx = (ve::ContextD3D11*)context;
+  
   camera_.Initialize(gfx);
     
   float aspectRatio = float(gfx->width()) / float(gfx->height());
 	float fovAngleY = 70.0f * dx::XM_PI / 180.0f;
   camera_.BuildProjectionMatrix(fovAngleY,aspectRatio,0.01f,100.0f);
   dx::XMStoreFloat4x4(&vs_cb0_data.projection,camera_.projection_transposed());
-  camera_.camPosition = dx::XMVectorSet(0,4,9,0);
+  camera_.camPosition = dx::XMVectorSet(0,0,9,0);
   
 
   terrain_ = new Terrain();
@@ -45,7 +46,7 @@ int CubeScene::Initialize(ve::Context* context) {
   sky_->Initialize(context);
 
   AddRenderObject(sky_);
-  //AddRenderObject(terrain_);
+  AddRenderObject(terrain_);
 
     
   return hr;
@@ -68,7 +69,7 @@ concurrency::task<int> CubeScene::LoadAsync() {
   //auto loadVSTask = ve::ReadDataAsync(filename1.c_str());
   static auto filename2 = (ve::GetExePath() + "\\ps.cso");
   auto loadPSTask = ve::ReadDataAsync(filename2.c_str());
-
+/*
   static auto filename3 = (ve::GetExePath() + "\\test_hull.cso");
   auto loadHSTask = ve::ReadDataAsync(filename3.c_str());
   static auto filename4 = (ve::GetExePath() + "\\test_domain.cso");
@@ -92,13 +93,15 @@ concurrency::task<int> CubeScene::LoadAsync() {
     ID3D11GeometryShader* ptr;
     gfx->device()->CreateGeometryShader(fd.data,fd.length,0,&ptr);
     gs_.set_internal_pointer(ptr);
-  });
+  });*/
 
    
 
   auto sm_result = context_->shader_manager().RequestVertexShader("vs.cso",ve::VertexPositionColorElementDesc,ARRAYSIZE(ve::VertexPositionColorElementDesc));
   vs_ = sm_result.vs;
   input_layout_ = sm_result.il;
+
+
 	/*auto createVSTask = loadVSTask.then([this](ve::FileData fd){
     if (fd.data != nullptr) {
       gfx->CreateVertexShader(fd.data,fd.length,vs_);
@@ -127,9 +130,24 @@ concurrency::task<int> CubeScene::LoadAsync() {
     if (fd.data != nullptr) {
       gfx->CreatePixelShader(fd.data,fd.length,ps_);
 		  CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
-		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc,nullptr,&vs_cb0));
+      constantBufferDesc.CPUAccessFlags =  D3D11_CPU_ACCESS_WRITE;
+      constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc,nullptr,&vs_cb_list[0]));
+
+
 		  CD3D11_BUFFER_DESC constantBufferDesc2(sizeof(TimeConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
-		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc2,nullptr,&vs_cb1));
+		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc2,nullptr,&vs_cb_list[1]));
+      ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc2,nullptr,&ps_cb));
+
+		  CD3D11_BUFFER_DESC constantBufferDesc3(sizeof(ModelViewProjectionConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
+      constantBufferDesc3.CPUAccessFlags =  D3D11_CPU_ACCESS_WRITE;
+      constantBufferDesc3.Usage = D3D11_USAGE_DYNAMIC;
+		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc3,nullptr,&vs_cb_list[2]));
+
+
+		  
+
+
 
       SafeDeleteArray(&fd.data);
     }
@@ -137,8 +155,8 @@ concurrency::task<int> CubeScene::LoadAsync() {
 
 
 
-
-  auto createCubeTask = (createHSTask && createDSTask && createGSTask && createPSTask /*&& createVSTask*/ ).then([this] () {
+/*
+  auto createCubeTask = (createPSTask ).then([this] () {
 		ve::VertexPositionColor cubeVertices[] = 
 		{
 			{dx::XMFLOAT3(-0.5f, -0.5f, -0.5f), dx::XMFLOAT3(0.0f, 0.0f, 0.0f)},
@@ -199,9 +217,9 @@ concurrency::task<int> CubeScene::LoadAsync() {
 				&m_indexBuffer
 				)
 			);
-	});
+	});*/
 
-	return createCubeTask.then([this] () {
+	return createPSTask.then([this] () {
 
     terrain_->LoadAsync().get();
     sky_->LoadAsync().get();
@@ -249,20 +267,23 @@ concurrency::task<int> CubeScene::UnloadAsync() {
     sky_->UnloadAsync().get();
     terrain_->UnloadAsync().get();
     gfx->DestoryInputLayout(input_layout_);
-    SafeRelease(&vs_cb1);
-    SafeRelease(&vs_cb0);
-    SafeRelease(&m_vertexBuffer);
-    SafeRelease(&m_indexBuffer);
+    SafeRelease(&vs_cb_list[2]);
+    SafeRelease(&vs_cb_list[1]);
+    SafeRelease(&vs_cb_list[0]);
+    SafeRelease(&ps_cb);
+    //SafeRelease(&m_vertexBuffer);
+    //SafeRelease(&m_indexBuffer);
     gfx->DestroyShader(ps_);
     gfx->DestroyShader(vs_);
-    gfx->DestroyShader(gs_);
-    gfx->DestroyShader(ds_);
-    gfx->DestroyShader(hs_);
+    //gfx->DestroyShader(gs_);
+    //gfx->DestroyShader(ds_);
+    //gfx->DestroyShader(hs_);
     return (int)S_OK;
   });
 }
 
 int CubeScene::Set() {
+  gfx->SetShader(vs_); //default vertex shader
   gfx->PushRasterizerState(scene_rasterizer_state_);
   gfx->PushPixelShader(&ps_);
   return S_OK;
@@ -276,11 +297,8 @@ int CubeScene::Unset() {
 
 POINT mouse_current,mouse_last;
 int CubeScene::Update(float timeTotal, float timeDelta) {
-  (void) timeDelta; // Unused parameter.
 
-
-
-    
+   
   camera_.Update(timeDelta);
 	dx::XMVECTOR eye = dx::XMVectorSet(0.0f, 0.7f, 1.5f, 0.0f);
 	dx::XMVECTOR at = dx::XMVectorSet(0.0f, -0.1f, 0.0f, 0.0f);
@@ -292,19 +310,27 @@ int CubeScene::Update(float timeTotal, float timeDelta) {
   vs_cb1_data.deltaTime = timeDelta;
   vs_cb1_data.totalTime = timeTotal;
 	dx::XMStoreFloat4x4(&vs_cb0_data.view, camera_.view_transposed());
-  dx::XMStoreFloat4x4(&vs_cb0_data.viewInv, (dx::XMMatrixInverse(nullptr,camera_.view())));
+  auto viewInv = dx::XMMatrixTranspose(dx::XMMatrixInverse(nullptr,camera_.view()));
+
+  dx::XMStoreFloat4x4(&vs_cb0_data.viewInv, viewInv);
+  dx::XMStoreFloat4x4(&vs_cb2_data.viewInv, viewInv);
 
 	dx::XMStoreFloat4x4(&vs_cb0_data.model, dx::XMMatrixTranspose(dx::XMMatrixRotationY(timeTotal * dx::XM_PIDIV4)));
   dx::XMStoreFloat4x4(&vs_cb0_data.model, dx::XMMatrixTranspose(dx::XMMatrixIdentity()));
-  gfx->device_context()->UpdateSubresource(vs_cb0,0,NULL,&vs_cb0_data,0,0);
-  gfx->device_context()->UpdateSubresource(vs_cb1,0,NULL,&vs_cb1_data,0,0);
-  gfx->device_context()->VSSetConstantBuffers(0,1,&vs_cb0);
-  gfx->device_context()->VSSetConstantBuffers(1,1,&vs_cb1);
-    
+
+  gfx->CopyBufferFast(vs_cb_list[0],&vs_cb0_data,sizeof(vs_cb0_data));
+  //gfx->device_context()->UpdateSubresource1(vs_cb_list[0],0,NULL,&vs_cb0_data,0,0,D3D11_COPY_DISCARD);
+  gfx->device_context()->UpdateSubresource(vs_cb_list[1],0,NULL,&vs_cb1_data,0,0);
+
+  gfx->CopyBufferFast(vs_cb_list[2],&vs_cb2_data,sizeof(vs_cb2_data));
+
+  
    
   for (auto i : render_list_) {
     i->Update(timeTotal,timeDelta);
   }
+
+  
 
   return S_OK;
 }
@@ -330,6 +356,10 @@ int CubeScene::Render() {
     UpdateWorldMatrix(dx::XMMatrixTranspose(i->world()));
     //dx::XMStoreFloat4x4(&m_constantBufferData.model, dx::XMMatrixTranspose(i->world()));
     //gfx->device_context()->UpdateSubresource(m_constantBuffer,0,NULL,&m_constantBufferData,0,0);
+  //gfx->SetConstantBuffers()
+    gfx->device_context()->VSSetConstantBuffers(0,3,vs_cb_list);
+    //gfx->device_context()->VSSetConstantBuffers(1,1,&vs_cb1);
+    gfx->device_context()->PSSetConstantBuffers(0,1,&vs_cb_list[1]); 
     i->Render();
   }
   
@@ -339,7 +369,8 @@ int CubeScene::Render() {
 
 int CubeScene::UpdateWorldMatrix(const dx::XMMATRIX& world) {
   dx::XMStoreFloat4x4(&vs_cb0_data.model,world);
-  gfx->device_context()->UpdateSubresource(vs_cb0,0,NULL,&vs_cb0_data,0,0);
+  //gfx->device_context()->UpdateSubresource(vs_cb_list[0],0,NULL,&vs_cb0_data,0,0);
+  gfx->CopyBufferFast(vs_cb_list[0],&vs_cb0_data,sizeof(vs_cb0_data));
   return S_OK;
 }
 

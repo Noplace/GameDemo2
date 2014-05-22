@@ -79,13 +79,14 @@ void ClientMainWindow::Create() {
 }
 
 void ClientMainWindow::Start() {
+  renderer.Init(handle_);
   SetClientSize(640,480);
   Center();
   Show();
   //gl.Initialize(handle_,640,480,1,0,true);
   timer =  new ve::Timer();
-  renderer.Init(handle_);
-
+  
+  //renderer.OnWindowSizeChanged();
    
 
 }
@@ -137,6 +138,8 @@ void ClientMainWindow::Hide() {
 
 void ClientMainWindow::Fullscreen() {
   dispmode = 1;
+  renderer.gfx->Resize(1680,1050,true);
+/*
   display[dispmode].mode.dmPelsWidth = 1024;
   display[dispmode].mode.dmPelsHeight = 768;
 
@@ -146,7 +149,10 @@ void ClientMainWindow::Fullscreen() {
 
   auto r = ChangeDisplaySettings(&display[dispmode].mode,CDS_FULLSCREEN);
   ShowCursor(0);
+*/
   
+
+
     //HDC hDC = GetDC(CreateWindow("edit",0,WS_POPUP | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 0, 0, 0, 0, 0, 0));
   //wglMakeCurrent(hDC, wglCreateContext(hDC));
   //HDC hDC = GetDC(CreateWindow("edit",0,WS_POPUP | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 0, 0, 0, 0, 0, 0));
@@ -157,7 +163,8 @@ void ClientMainWindow::Fullscreen() {
 
 void ClientMainWindow::Windowed() {
   dispmode = 0;
-  display[dispmode].mode.dmPelsWidth = 640;
+  renderer.gfx->Resize(640,480,false);
+/*  display[dispmode].mode.dmPelsWidth = 640;
   display[dispmode].mode.dmPelsHeight = 480;
 
   ChangeDisplaySettings(0,0);
@@ -166,7 +173,7 @@ void ClientMainWindow::Windowed() {
   SetWindowLongPtr(handle_,GWL_STYLE,display[dispmode].style);
   SetClientSize(display[dispmode].mode.dmPelsWidth,display[dispmode].mode.dmPelsHeight);
   Center();
-
+*/
 
 }
 
@@ -176,16 +183,20 @@ void ClientMainWindow::Step() {
   static auto update_span_accumulator = 0.0f;
   static auto render_span_accumulator = 0.0f;
   static auto update_total_time = 0.0f;
+
+  static auto fps_accumlator = 0.0f;
+  static auto fps_counter = 0;
+
   auto time_span = timer->delta();
 
-  if (time_span > 500.0) //clamping time
-    time_span = 500.0;
+  if (time_span > 0.5f) //clamping time
+    time_span = 0.5f;
 
   update_span_accumulator += time_span;
   render_span_accumulator += time_span;
+  fps_accumlator += time_span;
   const float update_step_dt = 0.016667f;
   while (update_span_accumulator >= update_step_dt) {
-    
     renderer.Update(update_total_time,update_step_dt);
     update_span_accumulator -= update_step_dt;
     update_total_time += update_step_dt;
@@ -194,8 +205,20 @@ void ClientMainWindow::Step() {
   const float render_step_dt = 0.016667f;
   if (render_span_accumulator >= render_step_dt) {
     renderer.Render();
+    ++fps_counter;
     render_span_accumulator -= render_step_dt;
   }
+
+  if (fps_accumlator >= 1.0f) {
+    fps_ = fps_counter;
+    fps_accumlator -= 1.0f;
+    fps_counter = 0;
+    char str[25];
+    sprintf_s(str,"FPS: %03d",fps_);
+    SetWindowText(handle_,str);
+  }
+  
+  
 }
 
 LRESULT CALLBACK ClientMainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -217,10 +240,10 @@ LRESULT CALLBACK ClientMainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
     switch( uMsg ) {
       case WM_KEYDOWN:
         if (wParam == VK_F11) {
-          //if (win->dispmode == 0)
-            //win->Fullscreen();
-          //else
-            //win->Windowed();
+          if (win->dispmode == 0)
+            win->Fullscreen();
+          else
+            win->Windowed();
           
         }
         return 0;
@@ -229,9 +252,9 @@ LRESULT CALLBACK ClientMainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         return 0;
       case WM_MOUSEMOVE:
         {
-          char str[25];
-          sprintf_s(str,"x:%04d y:%04d",GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam));
-          SetWindowText(hwnd,str);
+          //char str[25];
+          //sprintf_s(str,"x:%04d y:%04d",GET_X_LPARAM(lParam),GET_Y_LPARAM(lParam));
+          //SetWindowText(hwnd,str);
         }
         return 0;
       case WM_LBUTTONUP:
@@ -241,8 +264,14 @@ LRESULT CALLBACK ClientMainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         if (wParam == SC_SCREENSAVE || wParam == SC_MONITORPOWER)
           return 0;
       break;
+      case WM_CREATE:
+        win->Start();
+        return 0;
       case WM_DESTROY:
         PostQuitMessage(0);
+        return 0;
+      case WM_SIZE:
+        win->renderer.OnWindowSizeChanged();
         return 0;
     }
   }

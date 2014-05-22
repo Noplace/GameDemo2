@@ -86,6 +86,7 @@
     <ClCompile Include="Code\sky.cpp" />
     <ClCompile Include="Code\terrain.cpp" />
     <ClCompile Include="Code\winmain.cpp" />
+    <ClCompile Include="Code\world_scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\client_main_window.h" />
@@ -95,7 +96,9 @@
     <ClInclude Include="Code\global.h" />
     <ClInclude Include="Code\sky.h" />
     <ClInclude Include="Code\terrain.h" />
+    <ClInclude Include="Code\third_person_camera.h" />
     <ClInclude Include="Code\timer.h" />
+    <ClInclude Include="Code\world_scene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\ps.hlsl">
@@ -104,6 +107,11 @@
     </FxCompile>
     <FxCompile Include="Resources\ps_clouds.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\ps_clouds2.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Resources\ps_flappybird.hlsl">
@@ -118,6 +126,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\ps_skybox.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\ps_spritebatch.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="Resources\ps_tex.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -153,6 +169,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="Resources\vs_sky.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\vs_skybox.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\vs_spritebatch.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Resources\vs_terrain.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
@@ -171,6 +199,7 @@
     <Image Include="Resources\cog.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
+    <Image Include="Resources\sky_cube.dds" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\clouds.hlsli" />

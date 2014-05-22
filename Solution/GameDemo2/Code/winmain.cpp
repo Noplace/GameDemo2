@@ -35,7 +35,7 @@ class Win32App  {
     window.Create();
 
     
-    window.Start();
+    //window.Start();
 
     MSG msg;
     

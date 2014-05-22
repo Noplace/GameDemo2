@@ -9,7 +9,7 @@ struct VertexShaderInput
 
 
 
-static const float foclen = 2500.0f;
+static const float foclen = 250.0f;
 
 void RayMarchVS(inout float3 pos : POSITION,
 				in float4 texcoord : TEXCOORD0,
@@ -18,29 +18,37 @@ void RayMarchVS(inout float3 pos : POSITION,
 {
 	// calculate world space eye ray
 	// origin
-	eyeray.o = mul(float4(0, 0, 0, 1), viewInv);
+	eyeray.o =  mul(float4(0, 0, 0, 1), viewInv_);
   float2 viewport = {640,480};
 	// direction
 	eyeray.d.xy = ((texcoord.xy*2.0)-1.0) * viewport;
 	eyeray.d.y = -eyeray.d.y;	// flip y axis
 	eyeray.d.z = foclen;
 	
-	eyeray.d = mul(eyeray.d, (float3x3) viewInv);
+	eyeray.d = mul(eyeray.d, (float3x3) viewInv_);
 }
 
 
 VertexShaderOutput main(VertexShaderInput input)
 {
 	VertexShaderOutput output;
- 
+  
+
 	float4 pos = float4(input.pos, 1.0f);
 
 	// Transform the vertex position into projected space.
+  
+  output.eyeray.o =  mul(float4(0, 0, 0, 1), viewInv_);
+  output.eyeray.d = mul(pos, model) - output.eyeray.o;
+  output.world_translation = mul(float4(0, 0, 0, 1),model);
+
 	pos = mul(pos, model);
 	pos = mul(pos, view);
 	pos = mul(pos, projection);
 	output.pos = pos;
-  RayMarchVS(input.pos,pos,output.eyeray);
+  //RayMarchVS(input.pos,pos,output.eyeray);
+ 
   output.uvw = input.uvw;
+
 	return output;
 }

@@ -33,6 +33,9 @@
     <ClCompile Include="Code\sky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Code\world_scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\global.h">
@@ -59,6 +62,12 @@
     <ClInclude Include="Code\sky.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Code\world_scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\third_person_camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\vs.hlsl" />
@@ -75,11 +84,18 @@
     <FxCompile Include="Resources\ps_sky.hlsl" />
     <FxCompile Include="Resources\ps_clouds.hlsl" />
     <FxCompile Include="Resources\vs_clouds.hlsl" />
+    <FxCompile Include="Resources\ps_clouds2.hlsl" />
+    <FxCompile Include="Resources\vs_spritebatch.hlsl" />
+    <FxCompile Include="Resources\vs_sky.hlsl" />
+    <FxCompile Include="Resources\vs_skybox.hlsl" />
+    <FxCompile Include="Resources\ps_skybox.hlsl" />
+    <FxCompile Include="Resources\ps_spritebatch.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\cog.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="Resources\sky_cube.dds" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\ps_global.hlsli" />

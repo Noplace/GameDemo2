@@ -39,15 +39,16 @@ void Renderer::Init(HWND handle_) {
   current_scene = loading_scene;
   current_scene->Set();
 
-  
-	auto new_scene = new CubeScene();
+return;
+
+	auto new_scene = new WorldScene();
   new_scene->Initialize(gfx);
   /*new_scene->LoadAsync().then([this,new_scene](int result){
     current_scene = new_scene;
     current_scene->Set();
   });*/
   new_scene->Load();
-  current_scene->Unset();
+  //current_scene->Unset();
   current_scene = new_scene;
   current_scene->Set();
   
@@ -58,8 +59,8 @@ void Renderer::Deinit() {
   current_scene->Unset();
   current_scene->Unload();
   current_scene->Deinitialize();
-  loading_scene->Unload();
-  loading_scene->Deinitialize();
+  //loading_scene->Unload();
+  //loading_scene->Deinitialize();
   gfx->Deinitialize();
   SafeDelete(&current_scene);
   SafeDelete(&gfx);
@@ -75,6 +76,11 @@ void Renderer::Render() {
   gfx->SetDefaultTargets();
   current_scene->Render();
   gfx->Render();
+}
+
+void Renderer::OnWindowSizeChanged() {
+  gfx->OnWindowSizeChange();
+  current_scene->OnWindowSizeChange();
 }
 
 }

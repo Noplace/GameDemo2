@@ -462,13 +462,3 @@ float snoise(float4 v)
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 #endif
-
-float ExpFilter(float  x) {
-
-  float cover = 0.6f;
-  float sharpness = 0.98f;
-
-  float c = (x - (1-cover));
-  if (c<0) c = 0;
-  return 1 - pow(sharpness, c*255);
-}
