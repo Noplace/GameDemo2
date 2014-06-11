@@ -463,7 +463,7 @@ concurrency::task<int> Sky::LoadAsync() {
 		  return S_FALSE;
 	  }
     
-    /*context_->SetInputLayout(sky_il_);
+    context_->SetInputLayout(sky_il_);
     context_->PushVertexShader(&sky_vs_);
     //context_->PushPixelShader(&sky_ps_);
 	  UINT stride = sizeof(ve::VertexPositionColorTexture);
@@ -499,7 +499,7 @@ concurrency::task<int> Sky::LoadAsync() {
     gfx->DrawIndexed(36,0,0);
     context_->PopVertexShader();
     context_->PopPixelShader();
-  */
+  
 
     return S_OK;
   }

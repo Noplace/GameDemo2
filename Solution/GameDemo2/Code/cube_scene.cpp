@@ -129,7 +129,7 @@ concurrency::task<int> CubeScene::LoadAsync() {
 	auto createPSTask = loadPSTask.then([this](ve::FileData fd){
     if (fd.data != nullptr) {
       gfx->CreatePixelShader(fd.data,fd.length,ps_);
-		  CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ModelViewProjectionConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
+		  CD3D11_BUFFER_DESC constantBufferDesc(sizeof(ve::ModelViewProjectionConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
       constantBufferDesc.CPUAccessFlags =  D3D11_CPU_ACCESS_WRITE;
       constantBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc,nullptr,&vs_cb_list[0]));
@@ -139,7 +139,7 @@ concurrency::task<int> CubeScene::LoadAsync() {
 		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc2,nullptr,&vs_cb_list[1]));
       ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc2,nullptr,&ps_cb));
 
-		  CD3D11_BUFFER_DESC constantBufferDesc3(sizeof(ModelViewProjectionConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
+		  CD3D11_BUFFER_DESC constantBufferDesc3(sizeof(ve::ModelViewProjectionConstantBuffer),D3D11_BIND_CONSTANT_BUFFER);
       constantBufferDesc3.CPUAccessFlags =  D3D11_CPU_ACCESS_WRITE;
       constantBufferDesc3.Usage = D3D11_USAGE_DYNAMIC;
 		  ThrowIfFailed(gfx->device()->CreateBuffer(&constantBufferDesc3,nullptr,&vs_cb_list[2]));

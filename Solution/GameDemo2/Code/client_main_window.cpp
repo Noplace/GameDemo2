@@ -138,7 +138,7 @@ void ClientMainWindow::Hide() {
 
 void ClientMainWindow::Fullscreen() {
   dispmode = 1;
-  renderer.gfx->Resize(1680,1050,true);
+  renderer.gfx->Resize(1680,1050,false);
 /*
   display[dispmode].mode.dmPelsWidth = 1024;
   display[dispmode].mode.dmPelsHeight = 768;
@@ -247,6 +247,9 @@ LRESULT CALLBACK ClientMainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
           
         }
         return 0;
+      case WM_KEYUP:
+          win->renderer.current_scene->OnInput(WM_KEYUP,wParam);
+        return 0;
       case WM_LBUTTONDOWN:
         SetCapture(hwnd);
         return 0;
@@ -271,7 +274,7 @@ LRESULT CALLBACK ClientMainWindow::WindowProc(HWND hwnd, UINT uMsg, WPARAM wPara
         PostQuitMessage(0);
         return 0;
       case WM_SIZE:
-        win->renderer.OnWindowSizeChanged();
+        win->renderer.OnWindowSizeChange(LOWORD(lParam),HIWORD(lParam));
         return 0;
     }
   }

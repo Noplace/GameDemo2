@@ -61,7 +61,7 @@ class Terrain : public ve::RenderObject {
 	//ID3D11Buffer* cb;
   ve::InputLayout input_layout_;
 	uint32_t m_indexCount;
-	ModelViewProjectionConstantBuffer cb_data;
+	ve::ModelViewProjectionConstantBuffer cb_data;
   ve::HullShader hs_;//ps_,ds_,hs_,gs_;
   ve::DomainShader ds_;
   ve::VertexShader vs_;

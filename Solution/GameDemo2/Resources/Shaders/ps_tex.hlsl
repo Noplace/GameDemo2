@@ -69,6 +69,6 @@ float4 main(PixelShaderInput input) : SV_TARGET
   return textureColor*float4(1.0f,1.0f,1.0f,opacity);
   //float p = CreatePerlinNoise(input.uv.x*100,input.uv.y*100);
   //float p = inoise(float3(input.uv,0));
- // float4 color = float4(p,p,p,1.0f);
+  //float4 color = float4(p,p,p,1.0f);
 	//return color*float4(input.color,1.0f);
 }

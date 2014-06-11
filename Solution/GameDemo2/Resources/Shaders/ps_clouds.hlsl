@@ -235,8 +235,9 @@ float4 raymarch( in float3 ro, in float3 rd )
 
 float4 main(VertexShaderOutput input) : SV_TARGET
 {
-
-/*  float4 res = raymarch( input.eyeray.o, input.eyeray.d );
+  //input.eyeray.d = normalize(input.eyeray.d);
+  input.eyeray.o = normalize(input.eyeray.o);
+  float4 res = raymarch( input.eyeray.o, input.eyeray.d );
 
 	float sun = clamp( dot(sundir,input.eyeray.d), 0.0, 1.0 );
 	float3 col = float3(0.6,0.71,0.75) - input.eyeray.d.y*0.2*float3(1.0,0.5,1.0) + 0.15*0.5;
@@ -244,7 +245,7 @@ float4 main(VertexShaderOutput input) : SV_TARGET
 	col *= 0.95;
 	col = lerp( col, res.xyz, res.w );
 	col += 0.1*float3(1.0,0.4,0.2)*pow( sun, 3.0 );
-  return float4(col,1);*/
+  return float4(col,1);
 
 //return volumeTexture.Sample(volumeSampler,input.uvw);
   //return volume(input.uvw);
@@ -252,7 +253,7 @@ float4 main(VertexShaderOutput input) : SV_TARGET
 
   
 
-  return RayMarchPS(input);
+  //return RayMarchPS(input);
   
 
 //float4 a = shaderTexture.Sample(SampleType, input.uvw);

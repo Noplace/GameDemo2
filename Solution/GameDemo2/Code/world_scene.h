@@ -70,7 +70,7 @@ class WorldScene : public ve::Scene {
 	ID3D11Buffer* vs_cb_list[3];
   ve::InputLayout input_layout_;
 	//uint32_t m_indexCount;
-	ModelViewProjectionConstantBuffer vs_cb0_data;
+	ve::ModelViewProjectionConstantBuffer vs_cb0_data;
   TimeConstantBuffer vs_cb1_data;
   ViewInverseConstantBuffer vs_cb2_data;
   //ve::Shader ds_,hs_,gs_;

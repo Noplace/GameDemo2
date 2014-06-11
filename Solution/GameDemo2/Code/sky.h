@@ -59,7 +59,7 @@ class Sky : public ve::RenderObject {
   ID3D11RasterizerState* sky_rasterizer_state_;
   ve::InputLayout sky_il_,clouds_il_;
 	uint32_t sky_index_count;
-	ModelViewProjectionConstantBuffer sky_vs_cb0_data;
+	ve::ModelViewProjectionConstantBuffer sky_vs_cb0_data;
   SkyPSShaderCB1 sky_ps_cb1_data;
   ve::PixelShader sky_ps_;
   ve::VertexShader sky_vs_;

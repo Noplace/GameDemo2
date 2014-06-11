@@ -4,7 +4,7 @@ Texture2D shaderTexture : register(t0);
 
 SamplerState SampleType
 {
-    Filter = MIN_MAG_MIP_LINEAR;
+    Filter = MIN_MAG_MIP_POINT;
     AddressU = Wrap;
     AddressV = Wrap;
     AddressW = Wrap;
@@ -24,6 +24,7 @@ struct VertexShaderOutput
 float4 main(VertexShaderOutput input) : SV_TARGET
 {
   float4 textureColor;
+  //input.uv.x = input.uv.x*sin(input.uv.y);
   textureColor = shaderTexture.Sample(SampleType, input.uv);
   
   return textureColor*input.color;//float4(1.0f,1.0f,1.0f,input.color.w);

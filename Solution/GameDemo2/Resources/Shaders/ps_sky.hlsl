@@ -1,5 +1,6 @@
 #include <ps_global.hlsli>
 
+/*
 cbuffer CameraPSCB1 : register(b1)
 {
 	float4 cameraLookAt;
@@ -7,8 +8,7 @@ cbuffer CameraPSCB1 : register(b1)
   float4 cameraUp;
 	float4 cameraForward;
   float4 cameraRight;
-};
-
+};*/
 
 static const float turbidity = 2.0;
 static const float rayleighCoefficient = 2.5;
@@ -124,15 +124,15 @@ float4 main(PixelShaderInput input) : SV_TARGET
 	//float t = totalTime*0.0;									// time value, used to animate stuff
 	float screenAspectRatio = resolution.x/resolution.y;					// the aspect ratio of the screen (e.g. 16:9)
 	//float3 finalColor = float3(0.1,0.1,0.1);								// The background color, dark gray in this case
-	
+
    //Camera setup
 	Camera cam;										// Make a struct holding all camera parameters
-  cam.lookAt = cameraLookAt;//							// The point the camera is looking at
-	cam.position = cameraPosition;//				// The position of the camera
-	cam.up = cameraUp;//float3(0,0,1);									// The up vector, change to make the camera roll, in world space
-  cam.forward = cameraForward;//normalize(cam.lookAt-cam.position);					// The camera forward vector, pointing directly at the lookat point
-  cam.left = cameraRight; //cross(cam.forward, cam.up);							// The left vector, which is perpendicular to both forward and up
- 	//cam.up = cross(cam.left, cam.forward);							// The recalculated up vector, in camera space
+  cam.lookAt = float3(0,0,3);//cameraLookAt;//							// The point the camera is looking at
+	cam.position = float3(0, 5, 0);//cameraPosition;//				// The position of the camera
+	cam.up = float3(0,0,1);//cameraUp;									// The up vector, change to make the camera roll, in world space
+  cam.forward = normalize(cam.lookAt-cam.position);	//cameraForward;//				// The camera forward vector, pointing directly at the lookat point
+  cam.left = cross(cam.forward, cam.up);	//cameraRight; //						// The left vector, which is perpendicular to both forward and up
+ 	cam.up = cross(cam.left, cam.forward);							// The recalculated up vector, in camera space
  
 	float3 screenOrigin = (cam.position+cam.forward); 					// Position in 3d space of the center of the screen
 	float3 screenHit = screenOrigin + vPos.x*cam.left*screenAspectRatio + vPos.y*cam.up; 	// Position in 3d space where the camera ray intersects the screen

@@ -29,14 +29,6 @@ inline void ThrowIfFailed(HRESULT hr)
 	}
 }
 
-__declspec(align(16))
-struct ModelViewProjectionConstantBuffer
-{
-	dx::XMFLOAT4X4 model;
-	dx::XMFLOAT4X4 view;
-  dx::XMFLOAT4X4 viewInv;
-	dx::XMFLOAT4X4 projection;
-};
 
 __declspec(align(16))
 struct TimeConstantBuffer {
@@ -58,7 +50,7 @@ class Renderer {
   void Deinit();
   void Update(float , float);
   void Render();
-  void OnWindowSizeChanged();
+  void OnWindowSizeChange(uint32_t width, uint32_t height);
   ve::ContextD3D11* gfx;
   ve::Scene* current_scene;
 

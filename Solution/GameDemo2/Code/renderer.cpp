@@ -39,7 +39,7 @@ void Renderer::Init(HWND handle_) {
   current_scene = loading_scene;
   current_scene->Set();
 
-return;
+
 
 	auto new_scene = new WorldScene();
   new_scene->Initialize(gfx);
@@ -78,8 +78,8 @@ void Renderer::Render() {
   gfx->Render();
 }
 
-void Renderer::OnWindowSizeChanged() {
-  gfx->OnWindowSizeChange();
+void Renderer::OnWindowSizeChange(uint32_t width, uint32_t height) {
+  gfx->OnWindowSizeChange(width,height);
   current_scene->OnWindowSizeChange();
 }
 
