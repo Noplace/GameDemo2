@@ -17,7 +17,7 @@
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                                         *
 *****************************************************************************************************************/
 #include "global.h"
-#include <VisualEssence/Code/util/DDSTextureLoader.h>
+#include <Solar/Code/util/DDSTextureLoader.h>
 
 namespace demo {
 

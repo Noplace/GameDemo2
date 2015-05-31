@@ -22,13 +22,13 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <math.h>
-#include <VisualEssence/Code/ve.h>
+#include <Solar/Code/ve.h>
 #include "timer.h"
 #include "third_person_camera.h"
 #include "renderer.h"
 #include "client_main_window.h"
 #include "terrain.h"
 #include "sky.h"
-#include "cube_scene.h"
-#include "world_scene.h"
+#include "scenes/cube_scene.h"
+#include "scenes/world_scene.h"
 

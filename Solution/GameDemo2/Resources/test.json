@@ -1,6 +1,6 @@
 [ { 
-	"name":"test"
-	"DepthEnable": "true"
+	"name":"test",
+	"DepthEnable": true
  },
 
 

@@ -16,7 +16,7 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE            *
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                                         *
 *****************************************************************************************************************/
-#include <VisualEssence/Code/util/WICTextureLoader.h>
+#include <Solar/Code/util/WICTextureLoader.h>
 
 
 
@@ -219,7 +219,9 @@ class LoadingScene : public ve::Scene {
     
     sprite_.Initialize(context);
     sprite_.set_opacity(0.5);
-    
+    sprite_.set_size(640,480);
+    //AddRenderObject(&sprite_);
+
     AddRenderObject(&camera1_node_);
     sprite_batch_.Initialize(context_);
     AddRenderObject(&sprite_batch_);
@@ -280,6 +282,14 @@ class LoadingScene : public ve::Scene {
   
     AddRenderObject(&font_writer_);
     
+    ve::EventManager em;
+    em.AddEventListener(1,[] (void* param){
+      int test;
+      test = 1+2;
+      return test;
+    });
+
+    em.TriggerEvent(1);
     return hr;
   }
 
@@ -307,61 +317,23 @@ class LoadingScene : public ve::Scene {
 
   concurrency::task<int> LoadAsync() {
 
-   
-    //static auto filename1 = (ve::GetExePath() + "\\vs_tex.cso");
-    //auto loadVSTask = ve::ReadDataAsync(filename1.c_str());
-
-    static auto filename2 = (ve::GetExePath() + "\\ps_clouds2.cso");
-    auto loadPSTask = ve::ReadDataAsync(filename2.c_str());
 
     auto vs_result = context_->shader_manager().RequestVertexShader("vs_tex.cso",ve::VertexPositionColorTextureElementDesc,ARRAYSIZE(ve::VertexPositionColorTextureElementDesc));
     vs_ = vs_result.vs;
     input_layout_ = vs_result.il;
 
-  
-
-
-  
-
-	  /*auto createVSTask = loadVSTask.then([this](ve::FileData fd){
-      if (fd.data != nullptr) {
-        gfx->CreateVertexShader(fd.data,fd.length,vs_);
-      
-    
-
-
-		    ThrowIfFailed(
-			    gfx->device()->CreateInputLayout(
-				    ve::VertexPositionColorTextureElementDesc,
-				    ARRAYSIZE(ve::VertexPositionColorTextureElementDesc),
-				    fd.data,
-				    fd.length,
-				    &m_inputLayout
-				    )
-			    );
-          SafeDeleteArray(&fd.data);
-      }
-    });*/
-
  
 
-	  auto createPSTask = loadPSTask.then([this](ve::FileData fd){
-      if (fd.data != nullptr) {
-        gfx->CreatePixelShader(fd.data,fd.length,ps_);
-      
+    auto createPSTask = context_->shader_manager().RequestPixelShaderAsync("ps_fractal.cso").then([this](ve::RequestPixelShaderResult result){
+      if (result.hr == S_FALSE)
+        throw;
+      ps_ = result.ps;
+		  CD3D11_BUFFER_DESC constantBufferDesc1(sizeof(LoadingScenePSCB), D3D11_BIND_CONSTANT_BUFFER);
+		  ThrowIfFailed( gfx->CreateBuffer(&constantBufferDesc1,nullptr, (void**)&ps_cb0));
 
-		    CD3D11_BUFFER_DESC constantBufferDesc1(sizeof(LoadingScenePSCB), D3D11_BIND_CONSTANT_BUFFER);
-		    ThrowIfFailed( gfx->CreateBuffer(&constantBufferDesc1,nullptr, (void**)&ps_cb0));
-
-
-		    CD3D11_BUFFER_DESC constantBufferDesc3(sizeof(SkyPSShaderCB1), D3D11_BIND_CONSTANT_BUFFER);
-		    ThrowIfFailed( gfx->CreateBuffer(&constantBufferDesc3,nullptr, (void**)&ps_cb1));
-
-        SafeDeleteArray(&fd.data);
-      }
+		  CD3D11_BUFFER_DESC constantBufferDesc3(sizeof(SkyPSShaderCB1), D3D11_BIND_CONSTANT_BUFFER);
+		  ThrowIfFailed( gfx->CreateBuffer(&constantBufferDesc3,nullptr, (void**)&ps_cb1));
     });
-
-
 
 
     auto createCubeTask = (createPSTask ).then([this] () {
@@ -604,6 +576,7 @@ dx::XMVectorSet(0,0,0,0))));
 	  gfx->device_context()->IASetVertexBuffers(0,1,&m_vertexBuffer,&stride,&offset);
 	  context_->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
     gfx->device_context()->DrawIndexed(m_indexCount,0,0);
+    //sprite_.Render();
     gfx->PopPixelShader();
     gfx->PopVertexShader();
 
@@ -667,6 +640,7 @@ dx::XMVectorSet(0,0,0,0))));
 	
   LoadingScenePSCB ps_cb0_data;
   SkyPSShaderCB1 ps_cb1_data;
+  ve::Sprite background_sprite_;
   ve::SpriteBatch sprite_batch_;
   ve::SpriteBatchSprite* sprite_list[1000];
   ve::font::Writer font_writer_;

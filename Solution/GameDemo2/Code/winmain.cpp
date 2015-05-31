@@ -23,9 +23,26 @@ namespace demo {
 
 class Win32App  {
  public:
-  Win32App(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow) {
-  
+  Win32App(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow): apprunning_mutex_(NULL) {
+    Initialize();
   }
+  virtual ~Win32App() {
+    if (apprunning_mutex_)
+      CloseHandle(apprunning_mutex_);
+  }
+
+  bool Win32App::IsAlreadyRunning(LPCSTR identifier) {
+    apprunning_mutex_ = CreateMutex(NULL,TRUE,identifier);
+    if (GetLastError() == ERROR_ALREADY_EXISTS) {
+      return true;
+    }
+    return false;
+  }
+
+  int Initialize() {
+    return S_OK;
+  }
+
   int Run() {
     //if (RanBefore("My Super App") == true) {
     //  MessageBox(NULL,"App Already Running!","Error",MB_ICONWARNING);
@@ -33,13 +50,9 @@ class Win32App  {
     //}
     ClientMainWindow window;
     window.Create();
-
-    
     //window.Start();
 
     MSG msg;
-    
-
     do {
       if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
@@ -54,7 +67,7 @@ class Win32App  {
     return static_cast<int>(msg.wParam);
   }
  private:
-  
+  HANDLE apprunning_mutex_;
 };
 
 }

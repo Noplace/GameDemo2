@@ -24,16 +24,16 @@
     <ClCompile Include="Code\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Code\cube_scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Code\terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Code\sky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Code\world_scene.cpp">
+    <ClCompile Include="Code\scenes\cube_scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\scenes\world_scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,22 +50,22 @@
     <ClInclude Include="Code\renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Code\loading_scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Code\cube_scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Code\terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Code\sky.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Code\world_scene.h">
+    <ClInclude Include="Code\third_person_camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Code\third_person_camera.h">
+    <ClInclude Include="Code\scenes\cube_scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scenes\loading_scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\scenes\world_scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -94,6 +94,7 @@
     <FxCompile Include="Resources\Shaders\font_vs.hlsl" />
     <FxCompile Include="Resources\Shaders\rt_vs.hlsl" />
     <FxCompile Include="Resources\Shaders\rt_ps.hlsl" />
+    <FxCompile Include="Resources\Shaders\ps_khalidtest.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\cog.png">

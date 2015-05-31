@@ -16,21 +16,24 @@
 * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE            *
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                                         *
 *****************************************************************************************************************/
-#include "global.h"
+#include "../global.h"
 
 
 
 namespace demo {
 
-extern ve::SkyBox skybox;
 
-int WorldScene::Initialize(ve::Context* context) {
+
+int CubeScene::Initialize(ve::Context* context) {
   int hr = Scene::Initialize(context);
   gfx = (ve::ContextD3D11*)context;
   
   camera_.Initialize(gfx);
     
-
+  float aspectRatio = float(gfx->width()) / float(gfx->height());
+	float fovAngleY = 70.0f * dx::XM_PI / 180.0f;
+  camera_.BuildProjectionMatrix(fovAngleY,aspectRatio,0.01f,100.0f);
+  dx::XMStoreFloat4x4(&vs_cb0_data.projection,camera_.projection_transposed());
   camera_.camPosition = dx::XMVectorSet(0,0,9,0);
   
 
@@ -41,10 +44,7 @@ int WorldScene::Initialize(ve::Context* context) {
   terrain_->Initialize(context);
   sky_ = new Sky();
   sky_->Initialize(context);
-  skybox = new ve::SkyBox();
-  skybox->Initialize(context);
 
-  //AddRenderObject(skybox);
   AddRenderObject(sky_);
   AddRenderObject(terrain_);
 
@@ -52,8 +52,7 @@ int WorldScene::Initialize(ve::Context* context) {
   return hr;
 }
 
-int WorldScene::Deinitialize() {
-  skybox->Deinitialize();
+int CubeScene::Deinitialize() {
   sky_->Deinitialize();
   terrain_->Deinitialize();
   Scene::Deinitialize();
@@ -62,7 +61,7 @@ int WorldScene::Deinitialize() {
 
  
 
-concurrency::task<int> WorldScene::LoadAsync() {
+concurrency::task<int> CubeScene::LoadAsync() {
 
     
 
@@ -262,7 +261,7 @@ concurrency::task<int> WorldScene::LoadAsync() {
 	});
 }
 
-concurrency::task<int> WorldScene::UnloadAsync() {
+concurrency::task<int> CubeScene::UnloadAsync() {
   return concurrency::create_task([this](){
     SafeRelease(&scene_rasterizer_state_);
     sky_->UnloadAsync().get();
@@ -283,21 +282,21 @@ concurrency::task<int> WorldScene::UnloadAsync() {
   });
 }
 
-int WorldScene::Set() {
+int CubeScene::Set() {
   gfx->SetShader(vs_); //default vertex shader
   gfx->PushRasterizerState(scene_rasterizer_state_);
   gfx->PushPixelShader(&ps_);
   return S_OK;
 }
 
-int WorldScene::Unset() {
+int CubeScene::Unset() {
   gfx->PopPixelShader();
   gfx->PopRasterizerState();
   return S_OK;
 }
 
-
-int WorldScene::Update(float timeTotal, float timeDelta) {
+POINT mouse_current,mouse_last;
+int CubeScene::Update(float timeTotal, float timeDelta) {
 
    
   camera_.Update(timeDelta);
@@ -325,16 +324,20 @@ int WorldScene::Update(float timeTotal, float timeDelta) {
 
   gfx->CopyBufferFast(vs_cb_list[2],&vs_cb2_data,sizeof(vs_cb2_data));
 
+  
+   
   for (auto i : render_list_) {
     i->Update(timeTotal,timeDelta);
   }
+
+  
 
   return S_OK;
 }
   
 
 
-int WorldScene::Render() {
+int CubeScene::Render() {
 	if (!m_loadingComplete)
 	{
 		return S_FALSE;
@@ -364,7 +367,7 @@ int WorldScene::Render() {
   return S_OK;
 }
 
-int WorldScene::UpdateWorldMatrix(const dx::XMMATRIX& world) {
+int CubeScene::UpdateWorldMatrix(const dx::XMMATRIX& world) {
   dx::XMStoreFloat4x4(&vs_cb0_data.model,world);
   //gfx->device_context()->UpdateSubresource(vs_cb_list[0],0,NULL,&vs_cb0_data,0,0);
   gfx->CopyBufferFast(vs_cb_list[0],&vs_cb0_data,sizeof(vs_cb0_data));

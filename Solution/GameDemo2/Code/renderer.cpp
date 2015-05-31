@@ -17,7 +17,7 @@
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                                         *
 *****************************************************************************************************************/
 #include "global.h"
-#include "loading_scene.h"
+#include "scenes/loading_scene.h"
 
 namespace demo {
 
@@ -39,7 +39,7 @@ void Renderer::Init(HWND handle_) {
   current_scene = loading_scene;
   current_scene->Set();
 
-
+return;
 
 	auto new_scene = new WorldScene();
   new_scene->Initialize(gfx);

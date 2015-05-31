@@ -81,24 +81,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Code\client_main_window.cpp" />
-    <ClCompile Include="Code\cube_scene.cpp" />
+    <ClCompile Include="Code\scenes\cube_scene.cpp" />
     <ClCompile Include="Code\renderer.cpp" />
     <ClCompile Include="Code\sky.cpp" />
     <ClCompile Include="Code\terrain.cpp" />
     <ClCompile Include="Code\winmain.cpp" />
-    <ClCompile Include="Code\world_scene.cpp" />
+    <ClCompile Include="Code\scenes\world_scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\client_main_window.h" />
-    <ClInclude Include="Code\cube_scene.h" />
-    <ClInclude Include="Code\loading_scene.h" />
+    <ClInclude Include="Code\scenes\cube_scene.h" />
+    <ClInclude Include="Code\scenes\loading_scene.h" />
     <ClInclude Include="Code\renderer.h" />
     <ClInclude Include="Code\global.h" />
     <ClInclude Include="Code\sky.h" />
     <ClInclude Include="Code\terrain.h" />
     <ClInclude Include="Code\third_person_camera.h" />
     <ClInclude Include="Code\timer.h" />
-    <ClInclude Include="Code\world_scene.h" />
+    <ClInclude Include="Code\scenes\world_scene.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\font_ps.hlsl">
@@ -130,6 +130,11 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\ps_fractal.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\ps_khalidtest.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\ps_sky.hlsl">
@@ -211,11 +216,6 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\VisualEssence\VisualEssence.vcxproj">
-      <Project>{b5fda7c1-8125-4e2f-ba95-8a7e7cce635e}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Resources\cog.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -233,6 +233,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\test.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Solar\Solar.vcxproj">
+      <Project>{b5fda7c1-8125-4e2f-ba95-8a7e7cce635e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

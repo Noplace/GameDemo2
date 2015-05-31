@@ -25,7 +25,7 @@ ClientMainWindow::ClientMainWindow() {
   dispmode = 0;
   class_ = 0;
   memset(display,0,sizeof(display));
-  display[0].style = WS_VISIBLE | WS_BORDER|WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+  display[0].style = WS_VISIBLE | WS_BORDER|WS_CAPTION|WS_MINIMIZEBOX|WS_SYSMENU|WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SIZEBOX;
   display[1].style = WS_POPUP | WS_VISIBLE | WS_MAXIMIZE;
 
 
@@ -87,8 +87,6 @@ void ClientMainWindow::Start() {
   timer =  new ve::Timer();
   
   //renderer.OnWindowSizeChanged();
-   
-
 }
 
 void ClientMainWindow::Destroy() {
@@ -202,12 +200,12 @@ void ClientMainWindow::Step() {
     update_total_time += update_step_dt;
   }
 
-  const float render_step_dt = 0.016667f;
-  if (render_span_accumulator >= render_step_dt) {
+  //const float render_step_dt = 0.016667f;
+  //if (render_span_accumulator >= render_step_dt) {
     renderer.Render();
     ++fps_counter;
-    render_span_accumulator -= render_step_dt;
-  }
+    //render_span_accumulator -= render_step_dt;
+  //}
 
   if (fps_accumlator >= 1.0f) {
     fps_ = fps_counter;
