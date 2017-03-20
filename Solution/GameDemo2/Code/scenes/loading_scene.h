@@ -283,13 +283,13 @@ class LoadingScene : public ve::Scene {
     AddRenderObject(&font_writer_);
     
     ve::EventManager em;
-    em.AddEventListener(1,[] (void* param){
+    em.AddEventListener(1,[] (void* source, void* param){
       int test;
       test = 1+2;
       return test;
     });
 
-    em.TriggerEvent(1);
+    em.TriggerEvent(1,(void*)this);
     return hr;
   }
 
